@@ -293,8 +293,8 @@ func NormalizePercentRGB(Value string) string {
 //# Conversions from color Names to various formats.
 // #################################################################
 
-// Contains checks if a array contains a string
-func Contains(s []string, e string) bool {
+// contains checks if a array of strings contains a string
+func contains(s []string, e string) bool {
 	for _, output := range s {
 		if output == e {
 			return true
@@ -305,7 +305,7 @@ func Contains(s []string, e string) bool {
 
 // NamesToHex Convert a color name to a normalized hexadecimal color value
 func NamesToHex(Name string, Spec string) string {
-	if Contains(SupportedSpecifications, Spec) == true {
+	if contains(SupportedSpecifications, Spec) == true {
 		Normalized := strings.ToLower(Name)
 		if Spec == "html4" {
 			return HTML4NamesToHex[Normalized]
@@ -338,7 +338,7 @@ func NameToRGBPercent(Name string, Spec string) []string {
 
 // HexToName Convert a hexadecimal color value to its corresponding normalized color name, if any such name exists
 func HexToName(HexValue string, Spec string) string {
-	if Contains(SupportedSpecifications, Spec) == true {
+	if contains(SupportedSpecifications, Spec) == true {
 		Normalized := NormalizeHex(HexValue)
 		if Spec == "html4" {
 			return HTML4HexToNames[Normalized]
@@ -448,8 +448,8 @@ func RGBPercentToHex(RGBPercentTriplet []string) string {
 	return RGBToHex(RGBPercentToRGB(NormalizePercentTriplet(RGBPercentTriplet)))
 }
 
-// PercentToInteger Internal helper for converting a percentage value to an integer between 0 and 255 inclusive
-func PercentToInteger(Percent string) int {
+// percentToInteger Internal helper for converting a percentage value to an integer between 0 and 255 inclusive
+func percentToInteger(Percent string) int {
 	Num, err := strconv.ParseFloat(strings.Split(Percent, "%")[0], 64)
 	if err == nil {
 		Num = 255 * (Num / 100.0)
@@ -467,7 +467,7 @@ func RGBPercentToRGB(RGBPercentTriplet []string) []int {
 	RGBTriplet := []int{}
 	NormalizedTriplet := NormalizePercentTriplet(RGBPercentTriplet)
 	for i := range NormalizedTriplet {
-		RGBTriplet = append(RGBTriplet, PercentToInteger(NormalizedTriplet[i]))
+		RGBTriplet = append(RGBTriplet, percentToInteger(NormalizedTriplet[i]))
 	}
 	return RGBTriplet
 }
