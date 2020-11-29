@@ -27,7 +27,7 @@ func TestNormalizeIntegerRGB(t *testing.T) {
 }
 
 func TestNormalizePercentTriplet(t *testing.T) {
-	value := NormalizePercentTriplet([]string{"-10%", "250%", "500%"})
+	value, _ := NormalizePercentTriplet([]string{"-10%", "250%", "500%"})
 	expected := []string{"0%", "100%", "100%"}
 	for i := range value {
 		if value[i] != expected[i] {
@@ -37,21 +37,21 @@ func TestNormalizePercentTriplet(t *testing.T) {
 }
 
 func TestNormalizePercentRGB(t *testing.T) {
-	value := normalizePercentRGB("-5%")
+	value, _ := normalizePercentRGB("-5%")
 	if value != "0%" {
 		t.Error("expected 0%, got", value)
 	}
 }
 
 func TestNamesToHex(t *testing.T) {
-	value := NamesToHex("white", "css3")
+	value, _ := NameToHex("white", "css3")
 	if value != "#ffffff" {
 		t.Error("expected white, got", value)
 	}
 }
 
 func TestNameToRGB(t *testing.T) {
-	value := NameToRGB("navy", "css3")
+	value, _ := NameToRGB("navy", "css3")
 	expected := []int{0, 0, 128}
 	for i := range value {
 		if value[i] != expected[i] {
@@ -61,7 +61,7 @@ func TestNameToRGB(t *testing.T) {
 }
 
 func TestNameToRGBPercent(t *testing.T) {
-	value := NameToRGBPercent("navy", "css3")
+	value, _ := NameToRGBPercent("navy", "css3")
 	expected := []string{"0%", "0%", "50%"}
 	for i := range value {
 		if value[i] != expected[i] {
@@ -71,14 +71,14 @@ func TestNameToRGBPercent(t *testing.T) {
 }
 
 func TestHexToName(t *testing.T) {
-	value := HexToName("#daa520", "css3")
+	value, _ := HexToName("#daa520", "css3")
 	if value != "goldenrod" {
 		t.Error("expected goldenrod, got", value)
 	}
 }
 
 func TestHexToRGB(t *testing.T) {
-	value := HexToRGB("#000080")
+	value, _ := HexToRGB("#000080")
 	expected := []int{0, 0, 128}
 	for i := range value {
 		if value[i] != expected[i] {
@@ -88,7 +88,7 @@ func TestHexToRGB(t *testing.T) {
 }
 
 func TestHexToRGBPercent(t *testing.T) {
-	value := HexToRGBPercent("#000080")
+	value, _ := HexToRGBPercent("#000080")
 	expected := []string{"0%", "0%", "50%"}
 	for i := range value {
 		if value[i] != expected[i] {
@@ -98,7 +98,7 @@ func TestHexToRGBPercent(t *testing.T) {
 }
 
 func TestRGBToName(t *testing.T) {
-	value := RGBToName([]int{0, 0, 128}, "css3")
+	value, _ := RGBToName([]int{0, 0, 128}, "css3")
 	if value != "navy" {
 		t.Error("expected navy, got", value)
 	}
@@ -112,7 +112,7 @@ func TestRGBToHex(t *testing.T) {
 }
 
 func TestRGBToRGBPercent(t *testing.T) {
-	value := RGBToRGBPercent([]int{218, 165, 32})
+	value, _ := RGBToRGBPercent([]int{218, 165, 32})
 	expected := []string{"85.49%", "64.71%", "12.50%"}
 	for i := range value {
 		if value[i] != expected[i] {
@@ -122,21 +122,21 @@ func TestRGBToRGBPercent(t *testing.T) {
 }
 
 func TestRGBPercentToName(t *testing.T) {
-	value := RGBPercentToName([]string{"85.49%", "64.71%", "12.5%"}, "css3")
+	value, _ := RGBPercentToName([]string{"85.49%", "64.71%", "12.5%"}, "css3")
 	if value != "goldenrod" {
 		t.Error("expected goldenrod, got", value)
 	}
 }
 
 func TestRGBPercentToHex(t *testing.T) {
-	value := RGBPercentToHex([]string{"100%", "100%", "0%"})
+	value, _ := RGBPercentToHex([]string{"100%", "100%", "0%"})
 	if value != "#ffff00" {
 		t.Error("expected #ffff00, got", value)
 	}
 }
 
 func TestRGBPercentToRGB(t *testing.T) {
-	value := RGBPercentToRGB([]string{"0%", "0%", "50%"})
+	value, _ := RGBPercentToRGB([]string{"0%", "0%", "50%"})
 	expected := []int{0, 0, 128}
 	for i := range value {
 		if value[i] != expected[i] {
