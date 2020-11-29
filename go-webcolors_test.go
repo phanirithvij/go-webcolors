@@ -3,144 +3,144 @@ package webcolors
 import "testing"
 
 func TestNormalizeHex(t *testing.T) {
-    Value := NormalizeHex("#0099CC")
-    if Value != "#0099cc" {
-        t.Error("Expected #0099cc, got", Value)
-    }
+	value := NormalizeHex("#0099CC")
+	if value != "#0099cc" {
+		t.Error("expected #0099cc, got", value)
+	}
 }
 
 func TestNormalizeIntegerTriplet(t *testing.T) {
-    Value := NormalizeIntegerTriplet([]int{270, -20, 128})
-    Expected := []int{255, 0, 128}
-    for i := range Value {
-        if Value[i] != Expected[i] {
-            t.Error("Expected", Expected[i], " got", Value[i])
-        }
-    }
+	value := NormalizeIntegerTriplet([]int{270, -20, 128})
+	expected := []int{255, 0, 128}
+	for i := range value {
+		if value[i] != expected[i] {
+			t.Error("expected", expected[i], " got", value[i])
+		}
+	}
 }
 
 func TestNormalizeIntegerRGB(t *testing.T) {
-    Value := NormalizeIntegerRGB(270)
-    if Value != 255 {
-        t.Error("Expected 255, got", Value)
-    }
+	value := normalizeIntegerRGB(270)
+	if value != 255 {
+		t.Error("expected 255, got", value)
+	}
 }
 
 func TestNormalizePercentTriplet(t *testing.T) {
-    Value := NormalizePercentTriplet([]string{"-10%", "250%", "500%"})
-    Expected := []string{"0%", "100%", "100%"}
-    for i := range Value {
-        if Value[i] != Expected[i] {
-            t.Error("Expected", Expected[i], " got", Value[i])
-        }
-    }
+	value := NormalizePercentTriplet([]string{"-10%", "250%", "500%"})
+	expected := []string{"0%", "100%", "100%"}
+	for i := range value {
+		if value[i] != expected[i] {
+			t.Error("expected", expected[i], " got", value[i])
+		}
+	}
 }
 
 func TestNormalizePercentRGB(t *testing.T) {
-    Value := NormalizePercentRGB("-5%")
-    if Value != "0%" {
-        t.Error("Expected 0%, got", Value)
-    }
+	value := normalizePercentRGB("-5%")
+	if value != "0%" {
+		t.Error("expected 0%, got", value)
+	}
 }
 
 func TestNamesToHex(t *testing.T) {
-    Value := NamesToHex("white", "css3")
-    if Value != "#ffffff" {
-        t.Error("Expected white, got", Value)
-    }
+	value := NamesToHex("white", "css3")
+	if value != "#ffffff" {
+		t.Error("expected white, got", value)
+	}
 }
 
 func TestNameToRGB(t *testing.T) {
-    Value := NameToRGB("navy", "css3")
-    Expected := []int{0, 0, 128}
-    for i := range Value {
-        if Value[i] != Expected[i] {
-            t.Error("Expected", Expected[i], " got", Value[i])
-        }
-    }
+	value := NameToRGB("navy", "css3")
+	expected := []int{0, 0, 128}
+	for i := range value {
+		if value[i] != expected[i] {
+			t.Error("expected", expected[i], " got", value[i])
+		}
+	}
 }
 
 func TestNameToRGBPercent(t *testing.T) {
-    Value := NameToRGBPercent("navy", "css3")
-    Expected := []string{"0%", "0%", "50%"}
-    for i := range Value {
-        if Value[i] != Expected[i] {
-            t.Error("Expected", Expected[i], " got", Value[i])
-        }
-    }
+	value := NameToRGBPercent("navy", "css3")
+	expected := []string{"0%", "0%", "50%"}
+	for i := range value {
+		if value[i] != expected[i] {
+			t.Error("expected", expected[i], " got", value[i])
+		}
+	}
 }
 
 func TestHexToName(t *testing.T) {
-    Value := HexToName("#daa520", "css3")
-    if Value != "goldenrod" {
-        t.Error("Expected goldenrod, got", Value)
-    }
+	value := HexToName("#daa520", "css3")
+	if value != "goldenrod" {
+		t.Error("expected goldenrod, got", value)
+	}
 }
 
 func TestHexToRGB(t *testing.T) {
-    Value := HexToRGB("#000080")
-    Expected := []int{0, 0, 128}
-    for i := range Value {
-        if Value[i] != Expected[i] {
-            t.Error("Expected", Expected[i], " got", Value[i])
-        }
-    }
+	value := HexToRGB("#000080")
+	expected := []int{0, 0, 128}
+	for i := range value {
+		if value[i] != expected[i] {
+			t.Error("expected", expected[i], " got", value[i])
+		}
+	}
 }
 
 func TestHexToRGBPercent(t *testing.T) {
-    Value := HexToRGBPercent("#000080")
-    Expected := []string{"0%", "0%", "50%"}
-    for i := range Value {
-        if Value[i] != Expected[i] {
-            t.Error("Expected", Expected[i], " got", Value[i])
-        }
-    }
+	value := HexToRGBPercent("#000080")
+	expected := []string{"0%", "0%", "50%"}
+	for i := range value {
+		if value[i] != expected[i] {
+			t.Error("expected", expected[i], " got", value[i])
+		}
+	}
 }
 
 func TestRGBToName(t *testing.T) {
-    Value := RGBToName([]int{0, 0, 128}, "css3")
-    if Value != "navy" {
-        t.Error("Expected navy, got", Value)
-    }
+	value := RGBToName([]int{0, 0, 128}, "css3")
+	if value != "navy" {
+		t.Error("expected navy, got", value)
+	}
 }
 
 func TestRGBToHex(t *testing.T) {
-    Value := RGBToHex([]int{0, 0, 128})
-    if Value != "#000080" {
-        t.Error("Expected #000080, got", Value)
-    }
+	value := RGBToHex([]int{0, 0, 128})
+	if value != "#000080" {
+		t.Error("expected #000080, got", value)
+	}
 }
 
 func TestRGBToRGBPercent(t *testing.T) {
-    Value := RGBToRGBPercent([]int{218, 165, 32})
-    Expected := []string{"85.49%", "64.71%", "12.50%"}
-    for i := range Value {
-        if Value[i] != Expected[i] {
-            t.Error("Expected", Expected[i], " got", Value[i])
-        }
-    }
+	value := RGBToRGBPercent([]int{218, 165, 32})
+	expected := []string{"85.49%", "64.71%", "12.50%"}
+	for i := range value {
+		if value[i] != expected[i] {
+			t.Error("expected", expected[i], " got", value[i])
+		}
+	}
 }
 
 func TestRGBPercentToName(t *testing.T) {
-    Value := RGBPercentToName([]string{"85.49%", "64.71%", "12.5%"}, "css3")
-    if Value != "goldenrod" {
-        t.Error("Expected goldenrod, got", Value)
-    }
+	value := RGBPercentToName([]string{"85.49%", "64.71%", "12.5%"}, "css3")
+	if value != "goldenrod" {
+		t.Error("expected goldenrod, got", value)
+	}
 }
 
 func TestRGBPercentToHex(t *testing.T) {
-    Value := RGBPercentToHex([]string{"100%", "100%", "0%"})
-    if Value != "#ffff00" {
-        t.Error("Expected #ffff00, got", Value)
-    }
+	value := RGBPercentToHex([]string{"100%", "100%", "0%"})
+	if value != "#ffff00" {
+		t.Error("expected #ffff00, got", value)
+	}
 }
 
 func TestRGBPercentToRGB(t *testing.T) {
-    Value := RGBPercentToRGB([]string{"0%", "0%", "50%"})
-    Expected := []int{0, 0, 128}
-    for i := range Value {
-        if Value[i] != Expected[i] {
-            t.Error("Expected", Expected[i], " got", Value[i])
-        }
-    }
+	value := RGBPercentToRGB([]string{"0%", "0%", "50%"})
+	expected := []int{0, 0, 128}
+	for i := range value {
+		if value[i] != expected[i] {
+			t.Error("expected", expected[i], " got", value[i])
+		}
+	}
 }

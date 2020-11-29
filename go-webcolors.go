@@ -1,3 +1,9 @@
+/*Package webcolors Utility functions for working with the color names and color value
+formats defined by the HTML and CSS specifications for use in
+documents on the Web.
+
+See documentation in godoc for
+details of the supported formats, conventions and conversions.*/
 package webcolors
 
 import (
@@ -9,19 +15,38 @@ import (
 	"strings"
 )
 
+const (
+	// HTML4 html4
+	HTML4 = "html4"
+	// CSS2 css2
+	CSS2 = "css2"
+	// CSS21 css21
+	CSS21 = "css21"
+	// CSS3 css3
+	CSS3 = "css3"
+)
+
+// SupportedSpecifications supported specifications
+var SupportedSpecifications = []string{HTML4, CSS2, CSS21, CSS3}
+
 // HexColorRegex a regexp for hex colors
 var HexColorRegex = regexp.MustCompile(`^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$`)
 
-// SupportedSpecifications supported specifications
-var SupportedSpecifications = []string{"html4", "css2", "css21", "css3"}
-
 // HTML4NamesToHex mapping of html4 color names to hex colors
+//
+// The HTML 4 named colors.
+//
+// The canonical source for these color definitions is the HTML 4
+// specification:
+//
+// http://www.w3.org/TR/html401/types.html#h-6.5
 var HTML4NamesToHex = map[string]string{
 	"aqua":    "#00ffff",
 	"black":   "#000000",
 	"blue":    "#0000ff",
 	"fuchsia": "#ff00ff",
 	"green":   "#008000",
+	"gray":    "#808080",
 	"grey":    "#808080",
 	"lime":    "#00ff00",
 	"maroon":  "#800000",
@@ -33,16 +58,36 @@ var HTML4NamesToHex = map[string]string{
 	"teal":    "#008080",
 	"white":   "#ffffff",
 	"yellow":  "#ffff00",
-	"orange":  "#ffa500",
 }
 
 // CSS2NamesToHex mapping of css2 color names to hex colors
+//
+// CSS 2 used the same list as HTML 4.
 var CSS2NamesToHex = HTML4NamesToHex
 
 // CSS21NamesToHex mapping of css21 color names to hex colors
-var CSS21NamesToHex = HTML4NamesToHex
+//
+// CSS 2.1 added orange.
+var CSS21NamesToHex = make(map[string]string) // initialized in init()
 
 // CSS3NamesToHex mapping of css3 color names to hex colors
+//
+// The CSS 3/SVG named colors.
+//
+// The canonical source for these color definitions is the SVG
+// specification's color list (which was adopted as CSS 3's color
+// definition):
+//
+// http://www.w3.org/TR/SVG11/types.html#ColorKeywords
+//
+// CSS 3 also provides definitions of these colors:
+//
+// http://www.w3.org/TR/css3-color/#svg-color
+//
+// SVG provides the definitions as RGB triplets. CSS 3 provides them
+// both as RGB triplets and as hexadecimal. Since hex values are more
+// common in real-world HTML and CSS, the mapping below is to hex
+// values instead.
 var CSS3NamesToHex = map[string]string{
 	"aliceblue":            "#f0f8ff",
 	"antiquewhite":         "#faebd7",
@@ -134,7 +179,7 @@ var CSS3NamesToHex = map[string]string{
 	"mediumaquamarine":     "#66cdaa",
 	"mediumblue":           "#0000cd",
 	"mediumorchid":         "#ba55d3",
-	"mediumpurple":         "#9370d8",
+	"mediumpurple":         "#9370db",
 	"mediumseagreen":       "#3cb371",
 	"mediumslateblue":      "#7b68ee",
 	"mediumspringgreen":    "#00fa9a",
@@ -155,7 +200,7 @@ var CSS3NamesToHex = map[string]string{
 	"palegoldenrod":        "#eee8aa",
 	"palegreen":            "#98fb98",
 	"paleturquoise":        "#afeeee",
-	"palevioletred":        "#d87093",
+	"palevioletred":        "#db7093",
 	"papayawhip":           "#ffefd5",
 	"peachpuff":            "#ffdab9",
 	"peru":                 "#cd853f",
@@ -193,8 +238,9 @@ var CSS3NamesToHex = map[string]string{
 	"yellowgreen":          "#9acd32",
 }
 
-// ReverseMap reverses a map by it's value
-func ReverseMap(m map[string]string) map[string]string {
+// reverseMap Internal helper for generating reverse mappings; given a
+// dictionary, returns a new dictionary with keys and values swapped.
+func reverseMap(m map[string]string) map[string]string {
 	n := make(map[string]string)
 	for k, v := range m {
 		n[v] = k
@@ -206,88 +252,116 @@ func ReverseMap(m map[string]string) map[string]string {
 // #################################################################
 
 // HTML4HexToNames html4 color map of hex color values to color names
-var HTML4HexToNames = ReverseMap(HTML4NamesToHex)
+var HTML4HexToNames = reverseMap(HTML4NamesToHex)
 
 // CSS2HexToNames css2 color map of hex color values to color names
 var CSS2HexToNames = HTML4HexToNames
 
 // CSS21HexToNames css21 color map of hex color values to color names
-var CSS21HexToNames = ReverseMap(CSS21NamesToHex)
+var CSS21HexToNames = reverseMap(CSS21NamesToHex)
 
 // CSS3HexToNames css3 color map of hex color values to color names
-var CSS3HexToNames = ReverseMap(CSS3NamesToHex)
+var CSS3HexToNames = reverseMap(CSS3NamesToHex)
+
+func init() {
+	// copy map
+	for k, v := range HTML4NamesToHex {
+		CSS21NamesToHex[k] = v
+	}
+	// add orange
+	CSS21NamesToHex["orange"] = "#ffa500"
+
+	// CSS3 defines both 'gray' and 'grey', as well as defining either
+	// variant for other related colors like 'darkgray'/'darkgrey'. For a
+	// 'forward' lookup from name to hex, this is straightforward, but a
+	// 'reverse' lookup from hex to name requires picking one spelling.
+	//
+	// The way in which reverseMap() generates the reverse mappings will
+	// pick a spelling based on the ordering of map keys,
+	// here we manually pick a single spelling that will
+	// consistently be returned. Since 'gray' was the only spelling
+	// supported in HTML 4, CSS1, and CSS2, 'gray' and its varients are
+	// chosen.
+	CSS3HexToNames["#a9a9a9"] = "darkgray"
+	CSS3HexToNames["#2f4f4f"] = "darkslategray"
+	CSS3HexToNames["#696969"] = "dimgray"
+	CSS3HexToNames["#808080"] = "gray"
+	CSS3HexToNames["#d3d3d3"] = "lightgray"
+	CSS3HexToNames["#778899"] = "lightslategray"
+	CSS3HexToNames["#708090"] = "slategray"
+}
 
 // Normalization routines.
 // #################################################################
 
-// NormalizeHex Normalize a hexadecimal color value
+// NormalizeHex Normalize a hexadecimal color value to 6 digits, lowercase.
 func NormalizeHex(HexValue string) string {
-	HexDigits := HexColorRegex.FindStringSubmatch(HexValue)[1]
-	if len(HexDigits) == 3 {
+	hexDigits := HexColorRegex.FindStringSubmatch(HexValue)[1]
+	if len(hexDigits) == 3 {
 		finalhex := []string{}
-		for i := range HexDigits {
-			finalhex = append(finalhex, strings.Repeat(string(HexDigits[i]), 2))
+		for i := range hexDigits {
+			finalhex = append(finalhex, strings.Repeat(string(hexDigits[i]), 2))
 		}
 		return "#" + strings.ToLower(strings.Join(finalhex, ""))
 	}
-	return "#" + strings.ToLower(HexDigits)
+	return "#" + strings.ToLower(hexDigits)
 }
 
 // NormalizeIntegerTriplet Normalize an integer rgb triplet so that all values are within the range 0-255 inclusive.
 func NormalizeIntegerTriplet(RGBTriplet []int) []int {
-	IntegerTriplet := []int{NormalizeIntegerRGB(RGBTriplet[0]), NormalizeIntegerRGB(RGBTriplet[1]), NormalizeIntegerRGB(RGBTriplet[2])}
-	return IntegerTriplet
+	integerTriplet := []int{normalizeIntegerRGB(RGBTriplet[0]), normalizeIntegerRGB(RGBTriplet[1]), normalizeIntegerRGB(RGBTriplet[2])}
+	return integerTriplet
 }
 
-// NormalizeIntegerRGB Normalize value for use in an integer rgb triplet
-func NormalizeIntegerRGB(Value int) int {
-	if Value >= 0 && Value <= 255 {
-		return Value
-	} else if Value < 0 {
+// normalizeIntegerRGB Normalize value for use in an integer rgb triplet
+func normalizeIntegerRGB(value int) int {
+	if value >= 0 && value <= 255 {
+		return value
+	} else if value < 0 {
 		return 0
-	} else if Value > 255 {
+	} else if value > 255 {
 		return 255
 	}
 	return 0
 }
 
-// NormalizePercentTriplet Normalize a percentage rgb triplet to that all values are within the range 0%-100% inclusive.
-func NormalizePercentTriplet(RGBTriplet []string) []string {
-	FinalTriplet := []string{}
-	for i := range RGBTriplet {
-		FinalTriplet = append(FinalTriplet, NormalizePercentRGB(RGBTriplet[i]))
-	}
-	return FinalTriplet
-}
+// normalizePercentRGB Normalize value for use in a percentage rgb triplet
+func normalizePercentRGB(value string) string {
+	var percent = strings.Split(value, "%")[0]
 
-// NormalizePercentRGB Normalize value for use in a percentage rgb triplet
-func NormalizePercentRGB(Value string) string {
-	var Percent = strings.Split(Value, "%")[0]
-
-	if strings.Contains(Percent, ".") {
-		Percent, err := strconv.ParseFloat(Percent, 64)
+	if strings.Contains(percent, ".") {
+		percentf, err := strconv.ParseFloat(percent, 64)
 		if err == nil {
-			if Percent >= 0 && Percent <= 100 {
-				return strconv.FormatFloat(Percent, 'g', 4, 64) + "%"
-			} else if Percent < 0 {
+			if percentf >= 0 && percentf <= 100 {
+				return strconv.FormatFloat(percentf, 'g', 4, 64) + "%"
+			} else if percentf < 0 {
 				return "0%"
-			} else if Percent > 100 {
+			} else if percentf > 100 {
 				return "100%"
 			}
 		}
 	} else {
-		Percent, err := strconv.Atoi(Percent)
+		percentf, err := strconv.Atoi(percent)
 		if err == nil {
-			if Percent >= 0 && Percent <= 100 {
-				return strconv.Itoa(Percent) + "%"
-			} else if Percent < 0 {
+			if percentf >= 0 && percentf <= 100 {
+				return strconv.Itoa(percentf) + "%"
+			} else if percentf < 0 {
 				return "0%"
-			} else if Percent > 100 {
+			} else if percentf > 100 {
 				return "100%"
 			}
 		}
 	}
 	return ""
+}
+
+// NormalizePercentTriplet Normalize a percentage rgb triplet to that all values are within the range 0%-100% inclusive.
+func NormalizePercentTriplet(rgbTriplet []string) []string {
+	finalTriplet := []string{}
+	for i := range rgbTriplet {
+		finalTriplet = append(finalTriplet, normalizePercentRGB(rgbTriplet[i]))
+	}
+	return finalTriplet
 }
 
 //# Conversions from color Names to various formats.
@@ -304,116 +378,116 @@ func contains(s []string, e string) bool {
 }
 
 // NamesToHex Convert a color name to a normalized hexadecimal color value
-func NamesToHex(Name string, Spec string) string {
-	if contains(SupportedSpecifications, Spec) == true {
-		Normalized := strings.ToLower(Name)
-		if Spec == "html4" {
-			return HTML4NamesToHex[Normalized]
-		} else if Spec == "css2" {
-			return CSS2NamesToHex[Normalized]
-		} else if Spec == "css21" {
-			return CSS21NamesToHex[Normalized]
-		} else if Spec == "css3" {
-			return CSS3NamesToHex[Normalized]
+func NamesToHex(name string, spec string) string {
+	if contains(SupportedSpecifications, spec) == true {
+		normalized := strings.ToLower(name)
+		if spec == HTML4 {
+			return HTML4NamesToHex[normalized]
+		} else if spec == CSS2 {
+			return CSS2NamesToHex[normalized]
+		} else if spec == CSS21 {
+			return CSS21NamesToHex[normalized]
+		} else if spec == CSS3 {
+			return CSS3NamesToHex[normalized]
 		} else {
-			panic(Name + "has no defined color Name in " + Spec)
+			panic(name + "has no defined color Name in " + spec)
 		}
 	} else {
-		panic(Spec + "is not output supported Specification for color Name lookups")
+		panic(spec + "is not output supported Specification for color Name lookups")
 	}
 }
 
 // NameToRGB Convert a color name to a 3-tuple of integers suitable for use in an rgb triplet specifying that color
-func NameToRGB(Name string, Spec string) []int {
-	return HexToRGB(NamesToHex(Name, Spec))
+func NameToRGB(name string, spec string) []int {
+	return HexToRGB(NamesToHex(name, spec))
 }
 
 // NameToRGBPercent Convert a color name to a 3-tuple of percentages suitable for use in an rgb triplet specifying that color
-func NameToRGBPercent(Name string, Spec string) []string {
-	return RGBToRGBPercent(NameToRGB(Name, Spec))
+func NameToRGBPercent(name string, spec string) []string {
+	return RGBToRGBPercent(NameToRGB(name, spec))
 }
 
 // # Conversions from hexadecimal color Values to various formats.
 // #################################################################
 
 // HexToName Convert a hexadecimal color value to its corresponding normalized color name, if any such name exists
-func HexToName(HexValue string, Spec string) string {
-	if contains(SupportedSpecifications, Spec) == true {
-		Normalized := NormalizeHex(HexValue)
-		if Spec == "html4" {
-			return HTML4HexToNames[Normalized]
-		} else if Spec == "css2" {
-			return CSS2HexToNames[Normalized]
-		} else if Spec == "css21" {
-			return CSS21HexToNames[Normalized]
-		} else if Spec == "css3" {
-			return CSS3HexToNames[Normalized]
+func HexToName(hexValue string, spec string) string {
+	if contains(SupportedSpecifications, spec) == true {
+		normalized := NormalizeHex(hexValue)
+		if spec == HTML4 {
+			return HTML4HexToNames[normalized]
+		} else if spec == CSS2 {
+			return CSS2HexToNames[normalized]
+		} else if spec == CSS21 {
+			return CSS21HexToNames[normalized]
+		} else if spec == CSS3 {
+			return CSS3HexToNames[normalized]
 		} else {
-			panic(HexValue + "has no defined color Name in " + Spec)
+			panic(hexValue + "has no defined color Name in " + spec)
 		}
 	} else {
-		panic(Spec + "is not output supported Specification for color Name lookups")
+		panic(spec + "is not output supported Specification for color Name lookups")
 	}
 }
 
 // ByteToInt converts a hex bytearray to hex integer
-func ByteToInt(Input []byte) int {
-	var Output uint32
-	l := len(Input)
-	for i, b := range Input {
+func ByteToInt(input []byte) int {
+	var output uint32
+	l := len(input)
+	for i, b := range input {
 		shift := uint32((l - i - 1) * 8)
-		Output |= uint32(b) << shift
+		output |= uint32(b) << shift
 	}
-	return int(Output)
+	return int(output)
 }
 
 // HexToRGB Convert a hexadecimal color value to a 3-tuple of integers suitable for use in an rgb triplet specifying that color
-func HexToRGB(HexValue string) []int {
-	HexDigits := NormalizeHex(HexValue)
-	RGBTuple := []int{}
-	PartialHex1, err := hex.DecodeString(HexDigits[1:3])
+func HexToRGB(hexValue string) []int {
+	hexDigits := NormalizeHex(hexValue)
+	rgbTuple := []int{}
+	partialHex1, err := hex.DecodeString(hexDigits[1:3])
 	if err == nil {
-		RGBTuple = append(RGBTuple, ByteToInt(PartialHex1))
+		rgbTuple = append(rgbTuple, ByteToInt(partialHex1))
 	}
-	PartialHex2, err := hex.DecodeString(HexDigits[3:5])
+	partialHex2, err := hex.DecodeString(hexDigits[3:5])
 	if err == nil {
-		RGBTuple = append(RGBTuple, ByteToInt(PartialHex2))
+		rgbTuple = append(rgbTuple, ByteToInt(partialHex2))
 	}
-	PartialHex3, err := hex.DecodeString(HexDigits[5:7])
+	partialHex3, err := hex.DecodeString(hexDigits[5:7])
 	if err == nil {
-		RGBTuple = append(RGBTuple, ByteToInt(PartialHex3))
+		rgbTuple = append(rgbTuple, ByteToInt(partialHex3))
 	}
-	return RGBTuple
+	return rgbTuple
 }
 
 // HexToRGBPercent Convert a hexadecimal color value to a 3-tuple of percentages suitable for use in an rgb triplet representing that color
-func HexToRGBPercent(HexValue string) []string {
-	return RGBToRGBPercent(HexToRGB(HexValue))
+func HexToRGBPercent(hexValue string) []string {
+	return RGBToRGBPercent(HexToRGB(hexValue))
 }
 
 // # Conversions from  integer rgb() triplets to various formats.
 // #################################################################
 
 // RGBToName Convert a 3-tuple of integers, suitable for use in an rgb color triplet, to its corresponding normalized color name, if any such name exists
-func RGBToName(RGBTriplet []int, Spec string) string {
-	return HexToName(RGBToHex(NormalizeIntegerTriplet(RGBTriplet)), Spec)
+func RGBToName(rgbTriplet []int, spec string) string {
+	return HexToName(RGBToHex(NormalizeIntegerTriplet(rgbTriplet)), spec)
 }
 
 // RGBToHex Convert a 3-tuple of integers, suitable for use in an rgb color triplet, to a normalized hexadecimal value for that color
-func RGBToHex(RGBTriplet []int) string {
-	IntegerTriplet := NormalizeIntegerTriplet(RGBTriplet)
-	HexString := "#"
-	for i := range IntegerTriplet {
-		ByteCoded := make([]byte, 2)
-		binary.BigEndian.PutUint16(ByteCoded, uint16(IntegerTriplet[i]))
-		HexString = HexString + hex.EncodeToString(ByteCoded[1:2])
+func RGBToHex(rgbTriplet []int) string {
+	integerTriplet := NormalizeIntegerTriplet(rgbTriplet)
+	hexString := "#"
+	for i := range integerTriplet {
+		byteCoded := make([]byte, 2)
+		binary.BigEndian.PutUint16(byteCoded, uint16(integerTriplet[i]))
+		hexString = hexString + hex.EncodeToString(byteCoded[1:2])
 	}
-	return HexString
+	return hexString
 }
 
 // RGBToRGBPercent Convert a 3-tuple of integers, suitable for use in an rgb color triplet, to a 3-tuple of percentages suitable for use in representing that color
-func RGBToRGBPercent(RGBTriplet []int) []string {
-	Specials := map[int]string{
+func RGBToRGBPercent(rgbTriplet []int) []string {
+	specials := map[int]string{
 		255: "100%",
 		128: "50%",
 		64:  "25%",
@@ -421,53 +495,53 @@ func RGBToRGBPercent(RGBTriplet []int) []string {
 		16:  "6.25%",
 		0:   "0%",
 	}
-	RGBPercentTriplet := []string{}
-	NormalizedTriplet := NormalizeIntegerTriplet(RGBTriplet)
+	rgbPercentTriplet := []string{}
+	normalizedTriplet := NormalizeIntegerTriplet(rgbTriplet)
 
-	for i := range NormalizedTriplet {
-		if Name, ok := Specials[NormalizedTriplet[i]]; ok {
-			RGBPercentTriplet = append(RGBPercentTriplet, Name)
+	for i := range normalizedTriplet {
+		if Name, ok := specials[normalizedTriplet[i]]; ok {
+			rgbPercentTriplet = append(rgbPercentTriplet, Name)
 		} else {
-			PercentVal := (float64(NormalizedTriplet[i]) / 255.0) * 100
-			RGBPercentTriplet = append(RGBPercentTriplet, strconv.FormatFloat(PercentVal, 'g', 4, 64)+"%")
+			percentVal := (float64(normalizedTriplet[i]) / 255.0) * 100
+			rgbPercentTriplet = append(rgbPercentTriplet, strconv.FormatFloat(percentVal, 'g', 4, 64)+"%")
 		}
 	}
-	return RGBPercentTriplet
+	return rgbPercentTriplet
 }
 
 // # Conversions from Percentage rgb() triplets to various formats.
 // #################################################################
 
 // RGBPercentToName Convert a 3-tuple of percentages, suitable for use in an rgb color triplet, to its corresponding normalized color name, if any such name exists
-func RGBPercentToName(RGBPercentTriplet []string, Spec string) string {
-	return RGBToName(RGBPercentToRGB(NormalizePercentTriplet(RGBPercentTriplet)), Spec)
+func RGBPercentToName(rgbPercentTriplet []string, spec string) string {
+	return RGBToName(RGBPercentToRGB(NormalizePercentTriplet(rgbPercentTriplet)), spec)
 }
 
 // RGBPercentToHex Convert a 3-tuple of percentages, suitable for use in an rgb color triplet, to a normalized hexadecimal color value for that color
-func RGBPercentToHex(RGBPercentTriplet []string) string {
-	return RGBToHex(RGBPercentToRGB(NormalizePercentTriplet(RGBPercentTriplet)))
+func RGBPercentToHex(rgbPercentTriplet []string) string {
+	return RGBToHex(RGBPercentToRGB(NormalizePercentTriplet(rgbPercentTriplet)))
 }
 
 // percentToInteger Internal helper for converting a percentage value to an integer between 0 and 255 inclusive
-func percentToInteger(Percent string) int {
-	Num, err := strconv.ParseFloat(strings.Split(Percent, "%")[0], 64)
+func percentToInteger(percent string) int {
+	num, err := strconv.ParseFloat(strings.Split(percent, "%")[0], 64)
 	if err == nil {
-		Num = 255 * (Num / 100.0)
-		e := Num - math.Floor(Num)
+		num = 255 * (num / 100.0)
+		e := num - math.Floor(num)
 		if e < 0.5 {
-			return int(math.Floor(Num))
+			return int(math.Floor(num))
 		}
-		return int(math.Ceil(Num))
+		return int(math.Ceil(num))
 	}
 	return 0
 }
 
 // RGBPercentToRGB Convert a 3-tuple of percentages, suitable for use in an rgb color triplet, to a 3-tuple of integers suitable for use in representing that color
-func RGBPercentToRGB(RGBPercentTriplet []string) []int {
-	RGBTriplet := []int{}
-	NormalizedTriplet := NormalizePercentTriplet(RGBPercentTriplet)
-	for i := range NormalizedTriplet {
-		RGBTriplet = append(RGBTriplet, percentToInteger(NormalizedTriplet[i]))
+func RGBPercentToRGB(rgbPercentTriplet []string) []int {
+	rgbTriplet := []int{}
+	normalizedTriplet := NormalizePercentTriplet(rgbPercentTriplet)
+	for i := range normalizedTriplet {
+		rgbTriplet = append(rgbTriplet, percentToInteger(normalizedTriplet[i]))
 	}
-	return RGBTriplet
+	return rgbTriplet
 }
